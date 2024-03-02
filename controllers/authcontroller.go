@@ -101,3 +101,13 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	session, _ := config.Store.Get(r, config.SESSION_ID)
+
+	// delete session
+	session.Options.MaxAge = -1
+	session.Save(r, w)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+
+}
