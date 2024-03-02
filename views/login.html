@@ -18,14 +18,20 @@
             <h4>SIGN IN</h4>
             <p>Enter Your Username and Password</p>
             <hr>
+
+            {{ if .error }}
+                <div class="alert alert-danger">
+                    {{ .error }}
+                </div>
+            {{ end }}
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" name="username" id="username" class="form-control">
+                <input type="text" name="username" id="username" class="form-control" autocomplete="off">
             </div>
             <br>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" class="form-control">
+                <input type="password" name="password" id="password" class="form-control" autocomplete="off">
             </div>
             <br>
             <button type="submit" class="btn btn-success btn-block">SIGN IN</button>

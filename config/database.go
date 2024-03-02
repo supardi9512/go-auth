@@ -13,5 +13,6 @@ func DBConn() (db *sql.DB, err error) {
 	dbName := "go_auth"
 
 	db, err = sql.Open(dbDriver, dbUser+":"+dbPass+"@/"+dbName)
+
 	return
 }
