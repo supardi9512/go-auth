@@ -18,32 +18,44 @@
             <h4>SIGN UP</h4>
             <p>Please Fill In The Form Below To Register</p>
             <hr>
-
-            {{ if .error }}
-                <div class="alert alert-danger">
-                    {{ .error }}
-                </div>
-            {{ end }}
             <div class="form-group">
                 <label for="name">Name</label>
-                <input type="text" name="name" id="name" class="form-control" autocomplete="off">
+                <input type="text" name="name" id="name" class="form-control {{ if .validation.Name }} is-invalid {{ end }}" autocomplete="off">
+                <div class="invalid-feedback">
+                    {{ .validation.Name }}
+                </div>
             </div>
+            <br>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="text" name="email" id="email" class="form-control" autocomplete="off">
+                <input type="text" name="email" id="email" class="form-control {{ if .validation.Email }} is-invalid {{ end }}" autocomplete="off">
+                <div class="invalid-feedback">
+                    {{ .validation.Email }}
+                </div>
             </div>
+            <br>
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" name="username" id="username" class="form-control" autocomplete="off">
+                <input type="text" name="username" id="username" class="form-control {{ if .validation.Username }} is-invalid {{ end }}" autocomplete="off">
+                <div class="invalid-feedback">
+                    {{ .validation.Username }}
+                </div>
             </div>
             <br>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" class="form-control" autocomplete="off">
+                <input type="password" name="password" id="password" class="form-control {{ if .validation.Password }} is-invalid {{ end }}" autocomplete="off">
+                <div class="invalid-feedback">
+                    {{ .validation.Password }}
+                </div>
             </div>
+            <br>
             <div class="form-group">
                 <label for="cpassword">Confirm Password</label>
-                <input type="password" name="cpassword" id="cpassword" class="form-control" autocomplete="off">
+                <input type="password" name="cpassword" id="cpassword" class="form-control {{ if .validation.Cpassword }} is-invalid {{ end }}" autocomplete="off">
+                <div class="invalid-feedback">
+                    {{ .validation.Cpassword }}
+                </div>
             </div>
             <br>
             <button type="submit" class="btn btn-success w-100">SIGN UP</button>

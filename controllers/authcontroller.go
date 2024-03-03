@@ -113,6 +113,58 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		temp, _ := template.ParseFiles("views/register.html")
 		temp.Execute(w, nil)
 	} else if r.Method == http.MethodPost {
-		// register process
+
+		// get user input
+
+		r.ParseForm()
+
+		user := entities.User{
+			Name:      r.Form.Get("name"),
+			Email:     r.Form.Get("email"),
+			Username:  r.Form.Get("username"),
+			Password:  r.Form.Get("password"),
+			Cpassword: r.Form.Get("cpassword"),
+		}
+
+		// form validation
+
+		errorMessages := make(map[string]interface{})
+
+		if user.Name == "" {
+			errorMessages["Name"] = "Name is required"
+		}
+
+		if user.Email == "" {
+			errorMessages["Email"] = "Email is required"
+		}
+
+		if user.Username == "" {
+			errorMessages["Username"] = "Username is required"
+		}
+
+		if user.Password == "" {
+			errorMessages["Password"] = "Password is required"
+		}
+
+		if user.Cpassword == "" {
+			errorMessages["Cpassword"] = "Confirm Password is required"
+		} else {
+			if user.Cpassword != user.Password {
+				errorMessages["Cpassword"] = "Confirm Password doesn't match"
+			}
+		}
+
+		if len(errorMessages) > 0 {
+			data := map[string]interface{}{
+				"validation": errorMessages,
+			}
+
+			temp, _ := template.ParseFiles("views/register.html")
+			temp.Execute(w, data)
+		} else {
+
+			// register process to database
+
+		}
 	}
 }
