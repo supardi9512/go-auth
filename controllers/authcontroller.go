@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"go-auth/config"
 	"go-auth/entities"
 	"go-auth/models"
@@ -60,8 +59,6 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		var user entities.User
 		userModel.Where(&user, "username", UserInput.Username)
 
-		fmt.Printf(user.Username)
-
 		var message error
 
 		if user.Username == "" {
@@ -109,5 +106,13 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	session.Options.MaxAge = -1
 	session.Save(r, w)
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
 
+func Register(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		temp, _ := template.ParseFiles("views/register.html")
+		temp.Execute(w, nil)
+	} else if r.Method == http.MethodPost {
+		// register process
+	}
 }
