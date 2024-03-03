@@ -13,8 +13,8 @@ import (
 )
 
 type UserInput struct {
-	Username string
-	Password string
+	Username string `validate:"required"`
+	Password string `validate:"required"`
 }
 
 var userModel = models.NewUserModel()
@@ -24,27 +24,28 @@ func Index(w http.ResponseWriter, r *http.Request) {
 
 	session, _ := config.Store.Get(r, config.SESSION_ID)
 
-	if len(session.Values) == 0 { // check session
+	if len(session.Values) == 0 && session.Values["loggedIn"] != true { // check session
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 	} else {
-		if session.Values["loggedIn"] != true { // check session
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-		} else {
-
-			data := map[string]interface{}{
-				"name": session.Values["name"],
-			}
-
-			temp, _ := template.ParseFiles("views/index.html")
-			temp.Execute(w, data)
+		data := map[string]interface{}{
+			"name": session.Values["name"],
 		}
+
+		temp, _ := template.ParseFiles("views/index.html")
+		temp.Execute(w, data)
 	}
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		temp, _ := template.ParseFiles("views/login.html")
-		temp.Execute(w, nil)
+		session, _ := config.Store.Get(r, config.SESSION_ID)
+
+		if len(session.Values) > 0 && session.Values["loggedIn"] == true {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else {
+			temp, _ := template.ParseFiles("views/login.html")
+			temp.Execute(w, nil)
+		}
 	} else if r.Method == http.MethodPost {
 
 		// get user input from login page
@@ -56,47 +57,59 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			Password: r.Form.Get("password"),
 		}
 
-		// check username
+		errorMessages := validation.Struct(UserInput)
 
-		var user entities.User
-		userModel.Where(&user, "username", UserInput.Username)
-
-		var message error
-
-		if user.Username == "" {
-			message = errors.New("Your username or password is incorrect!")
-		} else {
-
-			// check password
-
-			errPassword := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(UserInput.Password))
-
-			if errPassword != nil {
-				message = errors.New("Your username or password is incorrect!")
-			}
-		}
-
-		if message != nil { // if login is error
-
+		if errorMessages != nil {
 			data := map[string]interface{}{
-				"error": message,
+				"validation": errorMessages,
 			}
 
 			temp, _ := template.ParseFiles("views/login.html")
 			temp.Execute(w, data)
 		} else {
-			// set session
 
-			session, _ := config.Store.Get(r, config.SESSION_ID)
+			// check username
 
-			session.Values["loggedIn"] = true
-			session.Values["name"] = user.Name
-			session.Values["email"] = user.Email
-			session.Values["username"] = user.Username
+			var user entities.User
+			userModel.Where(&user, "username", UserInput.Username)
 
-			session.Save(r, w)
+			var message error
 
-			http.Redirect(w, r, "/", http.StatusSeeOther)
+			if user.Username == "" {
+				message = errors.New("Your username or password is incorrect!")
+			} else {
+
+				// check password
+
+				errPassword := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(UserInput.Password))
+
+				if errPassword != nil {
+					message = errors.New("Your username or password is incorrect!")
+				}
+			}
+
+			if message != nil { // if login is error
+
+				data := map[string]interface{}{
+					"error": message,
+				}
+
+				temp, _ := template.ParseFiles("views/login.html")
+				temp.Execute(w, data)
+			} else {
+				// set session
+
+				session, _ := config.Store.Get(r, config.SESSION_ID)
+
+				session.Values["loggedIn"] = true
+				session.Values["name"] = user.Name
+				session.Values["email"] = user.Email
+				session.Values["username"] = user.Username
+
+				session.Save(r, w)
+
+				http.Redirect(w, r, "/", http.StatusSeeOther)
+			}
 		}
 	}
 }
@@ -112,8 +125,14 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 
 func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		temp, _ := template.ParseFiles("views/register.html")
-		temp.Execute(w, nil)
+		session, _ := config.Store.Get(r, config.SESSION_ID)
+
+		if len(session.Values) > 0 && session.Values["loggedIn"] == true {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else {
+			temp, _ := template.ParseFiles("views/register.html")
+			temp.Execute(w, nil)
+		}
 	} else if r.Method == http.MethodPost {
 
 		// get user input
@@ -127,62 +146,6 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			Password:  r.Form.Get("password"),
 			Cpassword: r.Form.Get("cpassword"),
 		}
-
-		// form validation
-
-		// errorMessages := make(map[string]interface{})
-
-		// if user.Name == "" {
-		// 	errorMessages["Name"] = "Name is required"
-		// }
-
-		// if user.Email == "" {
-		// 	errorMessages["Email"] = "Email is required"
-		// }
-
-		// if user.Username == "" {
-		// 	errorMessages["Username"] = "Username is required"
-		// }
-
-		// if user.Password == "" {
-		// 	errorMessages["Password"] = "Password is required"
-		// }
-
-		// if user.Cpassword == "" {
-		// 	errorMessages["Cpassword"] = "Confirm Password is required"
-		// } else {
-		// 	if user.Cpassword != user.Password {
-		// 		errorMessages["Cpassword"] = "Confirm Password doesn't match"
-		// 	}
-		// }
-
-		// if len(errorMessages) > 0 {
-		// 	data := map[string]interface{}{
-		// 		"validation": errorMessages,
-		// 	}
-
-		// 	temp, _ := template.ParseFiles("views/register.html")
-		// 	temp.Execute(w, data)
-		// } else {
-
-		// 	// hash password
-
-		// 	hashPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		// 	user.Password = string(hashPassword)
-
-		// 	// insert to database
-
-		// 	userModel.Create(user)
-
-		// 	data := map[string]interface{}{
-		// 		"message": "Registration successful",
-		// 	}
-
-		// 	temp, _ := template.ParseFiles("views/register.html")
-		// 	temp.Execute(w, data)
-		// }
-
-		// form validation process
 
 		errorMessages := validation.Struct(user)
 

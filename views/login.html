@@ -26,12 +26,18 @@
             {{ end }}
             <div class="form-group">
                 <label for="username">Username</label>
-                <input type="text" name="username" id="username" class="form-control" autocomplete="off">
+                <input type="text" name="username" id="username" class="form-control {{ if .validation.Username }} is-invalid {{ end }}" autocomplete="off">
+                <div class="invalid-feedback">
+                    {{ .validation.Username }}
+                </div>
             </div>
             <br>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password" class="form-control" autocomplete="off">
+                <input type="password" name="password" id="password" class="form-control {{ if .validation.Password }} is-invalid {{ end }}" autocomplete="off">
+                <div class="invalid-feedback">
+                    {{ .validation.Password }}
+                </div>
             </div>
             <br>
             <button type="submit" class="btn btn-success w-100">SIGN IN</button>
