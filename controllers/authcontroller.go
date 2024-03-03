@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go-auth/config"
 	"go-auth/entities"
+	"go-auth/libraries"
 	"go-auth/models"
 	"html/template"
 	"net/http"
@@ -17,6 +18,7 @@ type UserInput struct {
 }
 
 var userModel = models.NewUserModel()
+var validation = libraries.NewValidation()
 
 func Index(w http.ResponseWriter, r *http.Request) {
 
@@ -128,41 +130,71 @@ func Register(w http.ResponseWriter, r *http.Request) {
 
 		// form validation
 
-		errorMessages := make(map[string]interface{})
+		// errorMessages := make(map[string]interface{})
 
-		if user.Name == "" {
-			errorMessages["Name"] = "Name is required"
-		}
+		// if user.Name == "" {
+		// 	errorMessages["Name"] = "Name is required"
+		// }
 
-		if user.Email == "" {
-			errorMessages["Email"] = "Email is required"
-		}
+		// if user.Email == "" {
+		// 	errorMessages["Email"] = "Email is required"
+		// }
 
-		if user.Username == "" {
-			errorMessages["Username"] = "Username is required"
-		}
+		// if user.Username == "" {
+		// 	errorMessages["Username"] = "Username is required"
+		// }
 
-		if user.Password == "" {
-			errorMessages["Password"] = "Password is required"
-		}
+		// if user.Password == "" {
+		// 	errorMessages["Password"] = "Password is required"
+		// }
 
-		if user.Cpassword == "" {
-			errorMessages["Cpassword"] = "Confirm Password is required"
-		} else {
-			if user.Cpassword != user.Password {
-				errorMessages["Cpassword"] = "Confirm Password doesn't match"
-			}
-		}
+		// if user.Cpassword == "" {
+		// 	errorMessages["Cpassword"] = "Confirm Password is required"
+		// } else {
+		// 	if user.Cpassword != user.Password {
+		// 		errorMessages["Cpassword"] = "Confirm Password doesn't match"
+		// 	}
+		// }
 
-		if len(errorMessages) > 0 {
+		// if len(errorMessages) > 0 {
+		// 	data := map[string]interface{}{
+		// 		"validation": errorMessages,
+		// 	}
+
+		// 	temp, _ := template.ParseFiles("views/register.html")
+		// 	temp.Execute(w, data)
+		// } else {
+
+		// 	// hash password
+
+		// 	hashPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		// 	user.Password = string(hashPassword)
+
+		// 	// insert to database
+
+		// 	userModel.Create(user)
+
+		// 	data := map[string]interface{}{
+		// 		"message": "Registration successful",
+		// 	}
+
+		// 	temp, _ := template.ParseFiles("views/register.html")
+		// 	temp.Execute(w, data)
+		// }
+
+		// form validation process
+
+		errorMessages := validation.Struct(user)
+
+		if errorMessages != nil {
 			data := map[string]interface{}{
 				"validation": errorMessages,
+				"user":       user,
 			}
 
 			temp, _ := template.ParseFiles("views/register.html")
 			temp.Execute(w, data)
 		} else {
-
 			// hash password
 
 			hashPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
