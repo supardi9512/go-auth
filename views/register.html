@@ -18,6 +18,12 @@
             <h4>SIGN UP</h4>
             <p>Please Fill In The Form Below To Register</p>
             <hr>
+            {{ if .message }}
+                <div class="alert alert-danger">
+                    {{ .message }}
+                </div>
+                <hr>
+            {{ end }}
             <div class="form-group">
                 <label for="name">Name</label>
                 <input type="text" name="name" id="name" class="form-control {{ if .validation.Name }} is-invalid {{ end }}" autocomplete="off">

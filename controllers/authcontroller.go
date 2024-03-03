@@ -163,8 +163,21 @@ func Register(w http.ResponseWriter, r *http.Request) {
 			temp.Execute(w, data)
 		} else {
 
-			// register process to database
+			// hash password
 
+			hashPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+			user.Password = string(hashPassword)
+
+			// insert to database
+
+			userModel.Create(user)
+
+			data := map[string]interface{}{
+				"message": "Registration successful",
+			}
+
+			temp, _ := template.ParseFiles("views/register.html")
+			temp.Execute(w, data)
 		}
 	}
 }

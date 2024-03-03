@@ -18,11 +18,11 @@
             <h4>SIGN IN</h4>
             <p>Enter Your Username And Password</p>
             <hr>
-
             {{ if .error }}
                 <div class="alert alert-danger">
                     {{ .error }}
                 </div>
+                <hr>
             {{ end }}
             <div class="form-group">
                 <label for="username">Username</label>

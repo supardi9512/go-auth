@@ -23,7 +23,7 @@ func NewUserModel() *UserModel {
 }
 
 func (u UserModel) Where(user *entities.User, fieldName, fieldValue string) error {
-	row, err := u.db.Query("select * from users where "+fieldName+" = ? limit 1", fieldValue)
+	row, err := u.db.Query("SELECT * FROM users WHERE "+fieldName+" = ? LIMIT 1", fieldValue)
 
 	if err != nil {
 		return err
@@ -36,4 +36,16 @@ func (u UserModel) Where(user *entities.User, fieldName, fieldValue string) erro
 	}
 
 	return nil
+}
+
+func (u UserModel) Create(user entities.User) (int64, error) {
+	result, err := u.db.Exec("INSERT INTO users (name, email, username, password) VALUES(?,?,?,?)", user.Name, user.Email, user.Username, user.Password)
+
+	if err != nil {
+		return 0, err
+	}
+
+	lastInsertId, _ := result.LastInsertId()
+
+	return lastInsertId, nil
 }
